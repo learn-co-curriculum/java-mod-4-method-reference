@@ -11,18 +11,18 @@ Method references are a special type of lambda expression that make our code mor
 readable. There are four types of method references:
 
 - Static method reference
-- Instance method reference of a specific object
-- Instance method reference of a parameter object
+- Instance method reference of a particular object
+- Instance method reference of an arbitrary object of a particular type
 - Constructor reference
 
 The table shows equivalent syntax between a lambda expression and a method reference:
 
-| Method Reference                              | Lambda Expression                              | Method Reference               |
-|-----------------------------------------------|------------------------------------------------|--------------------------------|
-| Static method reference                       | `(args) ->  ClassName.staticMethodName(args)`  | ClassName::staticMethodName    |
-| Instance method reference of specific object  | `(args) ->  o.instanceMethodName(args)`        | o::instanceMethodName          |
-| Instance method reference of parameter object | `(o, args) ->  o.instanceMethodName(args)`     | ClassName::instanceMethodName  |
-| Constructor reference                         | `(args) -> new ClassName(args)`                | ClassName::new                 |
+| Method Reference                                                      | Lambda Expression                                    | Method Reference              |
+|-----------------------------------------------------------------------|------------------------------------------------------|-------------------------------|
+| Static method reference                                               | `(args) ->  ClassName.staticMethodName(args)`        | ClassName::staticMethodName   |
+| Instance method reference of a particular object                      | `(args) ->  object.instanceMethodName(args)`         | object::instanceMethodName    |
+| Instance method reference of an arbitrary object of a particular type | `(object, args) ->  object.instanceMethodName(args)` | ClassName::instanceMethodName |
+| Constructor reference                                                 | `(args) -> new ClassName(args)`                      | ClassName::new                |
 
 
 Let’s look at examples of each of these different types of references.
@@ -76,12 +76,11 @@ takes 2 String parameters and returns an int. The functional interface defines t
 abstract method `applyAsInt`, which is implemented by 
 the lambda expression and the method reference to call the static `combinedLength` method.
 
-## Instance Method Reference of a Specific Object
+## Instance Method Reference of a Particular Object
 
-A method reference `o::instanceMethodName`  can replace a lambda expression that
-calls an instance method on object `o` with the supplied parameters `(args) ->  o.instanceMethodName(args)`.
-Since variable `o` is not passed into the lambda expression as a parameter,
-it must be within scope of the lambda expression
+A method reference `object::instanceMethodName`  can replace a lambda expression that
+calls an instance method on the object with the supplied parameters `(args) ->  object.instanceMethodName(args)`.
+The variable `object` is not passed into the lambda expression as a parameter, but must be within scope of the lambda expression
 (i.e. a local variable of enclosing block, instance variable, or static variable).
 
 ```java
@@ -131,11 +130,11 @@ We then call the instance method `setBalance` on the object, passing the balance
 The lambda expression and the method reference both override the `accept` abstract method
 of functional interface `Consumer` by calling the `setBalance` instance method.
 
-## Instance Method Reference To A Parameter Object
+## Instance Method Reference of an Arbitrary Object of a Particular Type
 
-A method reference `o::instanceMethodName`  can replace a lambda expression that calls an
-instance method with the supplied parameters `(o, args) ->  o.instanceMethodName(args)`.
-The object reference `o` is passed into the lambda expression as a parameter.
+A method reference `ClassName::instanceMethodName`  can replace a lambda expression that calls an
+instance method with the supplied parameters `(object, args) ->  object.instanceMethodName(args)`, where `ClassName` is
+the type of parameter `object`.
 
 ```java
 import java.util.function.BiConsumer;
