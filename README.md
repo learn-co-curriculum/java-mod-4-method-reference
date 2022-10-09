@@ -4,6 +4,7 @@
 
 - Define the different types of method references.
 - Compare a lambda expression with an equivalent method reference.
+- Pass a method reference as a sort key function to `Comparator` methods.
 
 ## What are Method References?
 
@@ -39,6 +40,7 @@ public class StringHelper {
     }
 }
 ```
+
 ```java
 import java.util.function.*;
 
@@ -197,7 +199,146 @@ public class Example {
 }
 ```
 
+
+## Revisiting `Comparator` with method references
+
+Recall from the lesson on sorting the `Arrays.sort` method
+accepts a `Comparator` to determine order.
+
+The `List` interface also defines a `sort()` method
+that accepts a `Comparator`.
+
+Given the `Employee` class shown below,
+we may want to sort a list of employees by name, salary, or age.
+
+```java
+public class Employee {
+    private String name;
+    private double salary;
+    private int age;
+
+    public Employee(String name, double salary, int age) {
+        this.name = name;
+        this.salary = salary;
+        this.age = age;
+    }
+
+    public String getName() { return name; }
+
+    public double getSalary() { return salary; }
+
+    public int getAge() { return age; }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "name='" + name + '\'' +
+                ", salary=" + salary +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+We've seen how to create a new class that implements `Comparator`
+to produce a particular order.  The `Comparator` interface also defines
+a static function `Comparator.comparing` that takes a sort key `Function`
+for a type `T` as a parameter and returns a `Comparator` for type `T`.
+
+`static <T> Comparator<T>	comparing(Function<? super T> keyExtractor)`
+
+The variants `Comparator.comparingInt`, `Comparator.comparingDouble`,
+and `Comparator.comparingLong` extract a sort key function for
+data types `int`, `double`, and `long` respectively.
+
+We can pass an instance method reference as the sort key function:
+
+- `Comparator.comparing(Employee::getName)`
+- `Comparator.comparingDouble(Employee::getSalary)`
+- `Comparator.comparingInt(Employee::getAge)`
+
+
+For example, we can easily order the list of employees by name: 
+
+```java
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
+public class Example {
+    public static void main(String[] args) {
+        List<Employee> employees = Arrays.asList(
+                new Employee("Anna", 45000.0, 24),
+                new Employee("Fred", 58000.0, 32),
+                new Employee("Abel", 40000.0, 24));
+
+        employees.sort(Comparator.comparing(Employee::getName));
+        System.out.println(employees);
+    }
+}
+```
+
+The program prints the employees in alphabetical order by name:
+
+```text
+[Employee{name='Abel', salary=40000.0, age=24}, Employee{name='Anna', salary=45000.0, age=24}, Employee{name='Fred', salary=58000.0, age=32}]
+```
+
+The `Comparator` interface defines a method `reversed` that
+returns a comparator imposing a reverse order.
+
+`Comparator.comparingDouble(Employee::getSalary).reversed()`
+will order the employees in descending order of salary:
+
+```java
+public static void main(String[] args) {
+        List<Employee> employees = Arrays.asList(
+            new Employee("Anna", 45000.0, 24),
+            new Employee("Fred", 58000.0, 32),
+            new Employee("Abel", 40000.0, 24));
+
+        //Sort by salary in reverse order
+        employees.sort(Comparator.comparingDouble(Employee::getSalary).reversed());
+        System.out.println(employees);
+    }
+```
+
+The program prints:
+
+```text
+[Employee{name='Fred', salary=58000.0, age=32}, Employee{name='Anna', salary=45000.0, age=24}, Employee{name='Abel', salary=40000.0, age=24}]
+```
+
+The `Comparator` interface defines a method `thenComparing` that
+supports a primary sort on one key, followed by a secondary sort on another key.
+The variants `thenComparingInt`, `thenComparingDouble`, and `thenComparingLong`
+work with sort key functions for primitive data types.
+
+For example, to sort first by age and then by salary:
+ 
+```java
+   public static void main(String[] args) {
+        List<Employee> employees = Arrays.asList(
+                new Employee("Fred", 58000.0, 32),
+                new Employee("Anna", 45000.0, 24),
+                new Employee("Abel", 40000.0, 24));
+
+        //Primary sort by age, secondary sort by salary
+        employees.sort(Comparator.comparingInt(Employee::getAge).thenComparingDouble(Employee::getSalary));
+        System.out.println(employees);
+```
+
+The two employees with the same age are listed in ascending order of salary:
+
+```text
+[Employee{name='Abel', salary=40000.0, age=24}, Employee{name='Anna', salary=45000.0, age=24}, Employee{name='Fred', salary=58000.0, age=32}]
+```
+
 ## Summary
 
 A method reference is a concise way to write a lambda expression
 when the lambda body calls a static, instance, or constructor method with the supplied parameters.
+
+## Resources
+
+[Java 11 Comparator](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Comparator.html#thenComparingDouble(java.util.function.ToDoubleFunction))
