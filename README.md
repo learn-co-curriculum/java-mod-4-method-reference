@@ -208,6 +208,36 @@ accepts a `Comparator` to determine order.
 The `List` interface also defines a `sort()` method
 that accepts a `Comparator`.
 
+### Sorting a list of integers using a static method reference
+
+The `Integer` class has static method `compare` that implements `Comparator`.
+We can use the static method reference `Integer::compare`
+to pass the comparator to the sort method:
+
+```java
+import java.util.Arrays;
+import java.util.List;
+
+public class Example {
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(7,2,-4,12,8);
+
+        //pass static method reference as Comparator to sort method
+        numbers.sort(Integer::compare);
+        System.out.println(numbers);  //[-4, 2, 7, 8, 12]
+    }
+}
+```
+
+
+The program prints:
+
+```text
+[-4, 2, 7, 8, 12]
+```
+
+### Sorting a list of objects using a static method reference
+
 Given the `Employee` class shown below,
 we may want to sort a list of employees by name, salary, or age.
 
@@ -241,7 +271,9 @@ public class Employee {
 ```
 
 We've seen how to create a new class that implements `Comparator`
-to produce a particular order.  The `Comparator` interface also defines
+to produce a particular order.  
+
+The `Comparator` interface also defines
 a static function `Comparator.comparing` that takes a sort key `Function`
 for a type `T` as a parameter and returns a `Comparator` for type `T`.
 
